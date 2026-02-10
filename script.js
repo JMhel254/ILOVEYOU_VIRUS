@@ -46,10 +46,15 @@ function nextStep(step) {
     tryResumeMusic();
   }
 
-  // Start butterflies from step 2 onwards
+  // Start floating icons from step 2 onwards
   if (!butterfliesStarted && step >= 2) {
     butterfliesStarted = true;
-    startButterflies();
+    startFloatingIcons();
+  }
+
+  // Start word rotation on step 4
+  if (step === 4) {
+    startWordRotation();
   }
 }
 
@@ -125,34 +130,53 @@ function createBlessings() {
   setInterval(() => {
     const floater = document.createElement("div");
     floater.classList.add("floater");
-    const icons = ["❤", "🕊️", "✨", "✝️", "🦋", "💕", "🌸"];
+    const icons = [
+      "❤", "🕊️", "✨", "✝️", "🦋", "💕", "🌸", 
+      "💖", "🥰", "💍", "🤍", "😍", "💌", "💏",
+      "🌹", "🧸", "💒", "👰", "🤵"
+    ];
     floater.innerText = icons[Math.floor(Math.random() * icons.length)];
 
+    // Randomize position and size
     floater.style.left = Math.random() * 100 + "vw";
-    floater.style.animationDuration = Math.random() * 3 + 3 + "s";
-    floater.style.fontSize = Math.random() * 18 + 16 + "px";
+    floater.style.fontSize = Math.random() * 20 + 20 + "px"; // 20px - 40px
+    
+    // Vary the animation speed
+    const duration = Math.random() * 3 + 4; // 4s - 7s
+    floater.style.animationDuration = duration + "s";
+
+    // Add some random horizontal wobble
+    floater.style.transform = `translateX(${Math.random() * 40 - 20}px)`;
 
     document.body.appendChild(floater);
-    setTimeout(() => floater.remove(), 6000);
-  }, 250);
+    
+    // Remove after animation completes
+    setTimeout(() => floater.remove(), duration * 1000 + 100);
+  }, 100); // Faster spawn (100ms)
 }
 
 // ======================================
-// BUTTERFLIES
+// FLOATING ICONS (Background)
 // ======================================
-function startButterflies() {
+function startFloatingIcons() {
   // Spawn a few immediately
-  for (let i = 0; i < 3; i++) {
-    setTimeout(() => createButterfly(), i * 600);
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => createFloatingIcon(), i * 400);
   }
   // Then keep spawning
-  setInterval(() => createButterfly(), 3000);
+  setInterval(() => createFloatingIcon(), 2000);
 }
 
-function createButterfly() {
+function createFloatingIcon() {
   const b = document.createElement("div");
-  b.classList.add("butterfly");
-  b.innerText = "🦋";
+  b.classList.add("butterfly"); // Keeping class name for CSS compatibility, or adding new style?
+  // Let's reuse 'butterfly' class but change content, or better, add a specific style for mixed icons if needed.
+  // Actually, 'butterfly' class in CSS defines the animation. Let's see if we can reuse it.
+  // The user wants mixed icons, not just butterflies.
+  
+  const icons = ["🦋", "❤", "🕊️", "✨", "💕", "🌸", "💖", "🥰"];
+  b.innerText = icons[Math.floor(Math.random() * icons.length)];
+  
   b.style.fontSize = Math.random() * 16 + 18 + "px";
   b.style.left = Math.random() * 90 + 5 + "vw";
   b.style.animationDuration = Math.random() * 6 + 6 + "s";
@@ -161,30 +185,25 @@ function createButterfly() {
   setTimeout(() => b.remove(), 12000);
 }
 
+
 // ======================================
 // GALLERY — PREMIUM LIGHTBOX & DOTS
 // ======================================
 const galleryImages = [
-  // 📸 Your photos
-  { src: "images/1.jpg", caption: "🤍 The beginning of us" },
-  // 🍬 GIF
-  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTJ5OWw5NnBqaTFqMTl6NWd4aHRlZnhxMDB4ZWd0dmt3YmJxNHJsZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/M9OoGnXoNqBLnUGVRi/giphy.gif", caption: "🍬 Sweet like candy" },
-  // 📸 Your photo
-  { src: "images/2.jpg", caption: "✨ A moment of grace" },
+  // 📸 Photo 1
+  { src: "images/Image1.jpeg", caption: "🤍 The beginning of us" },
+    // 🌹 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGR6Y3JsZWR5MnRwMHN0MHlicTdsOHRoNDhjenZmaHdtdGJvMWJ3NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26FLdmIp6wJr91JAI/giphy.gif", caption: "🌹 Forever and always" },
+  // 📸 Photo 2
+  { src: "images/image2.jpeg", caption: "✨ Blessed with family" },
   // 💖 GIF
   { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW1yYzV5cW9tNHFpdW5laDQ4bThvN3JhdTdhNmV4Z2N5YWNiajJyeSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26BRv0ThflsHCqDrG/giphy.gif", caption: "💖 My heart is yours" },
-  // 📸 Your photo
-  { src: "images/3.jpg", caption: "💕 Side by side, always" },
+  // 📸 Photo 3
+  { src: "images/image3.jpeg", caption: "💕 Side by side, always" },
   // 🧸 GIF
   { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaW81aHRtYjlkY3libm5kNjQ3dTkyemVidmlqb2t2M250cjdsaWllaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3orieTfp1MeFLiBQR2/giphy.gif", caption: "🧸 Bear hugs for you" },
-  // 📸 Your photo
-  { src: "images/4.jpg", caption: "🌸 Blessed and grateful" },
-  // 💋 GIF
-  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJwOGxlMGU0cG5mMTh1a200bnc2NTBvb2RjajdsbmViYjMwcnl3NiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT0xeMA62E1XIlqVG0/giphy.gif", caption: "💋 Kisses and blessings" },
-  // 📸 Your photo
-  { src: "images/5.jpg", caption: "💍 Forever with you" },
-  // 🌹 GIF
-  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGR6Y3JsZWR5MnRwMHN0MHlicTdsOHRoNDhjenZmaHdtdGJvMWJ3NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26FLdmIp6wJr91JAI/giphy.gif", caption: "🌹 Forever and always" },
+   // 📸 Photo 4
+  { src: "images/image4.jpeg", caption: "🥰 Serving God together, always" },
 ];
 
 let currentLightboxIndex = 0;
@@ -361,4 +380,31 @@ function showConfirmation(date, time, message) {
 
   // Navigate to step 7
   nextStep(7);
+}
+
+// ======================================
+// DYNAMIC WORD ROTATION (STEP 4)
+// ======================================
+function startWordRotation() {
+  const wordSpan = document.getElementById("changing-word");
+  const words = ["Valentine", "Love", "Wife", "Date", "Future", "Forever", "Best Friend"];
+  let wordIndex = 0;
+
+  // Initial call - but don't overwrite if it's already there
+  if (!wordSpan) return;
+
+  setInterval(() => {
+    // Fade out
+    wordSpan.style.opacity = "0";
+    wordSpan.style.transition = "opacity 0.2s ease";
+
+    setTimeout(() => {
+      wordIndex = (wordIndex + 1) % words.length;
+      if (wordSpan) {
+        wordSpan.innerText = words[wordIndex];
+        // Fade in
+        wordSpan.style.opacity = "1";
+      }
+    }, 200);
+  }, 1200); // Change every 1.2 seconds for better readability
 }
