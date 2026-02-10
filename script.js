@@ -67,7 +67,7 @@ function checkItem(id) {
   box.innerText = "✅";
   checks++;
 
-  if (checks === 3) {
+  if (checks === 5) {
     const msg = document.getElementById("checklist-msg");
     msg.innerText = "Wait… that describes YOU perfectly! ✨";
 
@@ -165,26 +165,26 @@ function createButterfly() {
 // GALLERY — PREMIUM LIGHTBOX & DOTS
 // ======================================
 const galleryImages = [
-  {
-    src: "https://images.unsplash.com/photo-1518133835878-5a93cc3f89e5?q=80&w=1200&auto=format&fit=crop",
-    caption: "🤍 The beginning of us",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1522673607200-1648832cee48?q=80&w=1200&auto=format&fit=crop",
-    caption: "✨ A moment of grace",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?q=80&w=1200&auto=format&fit=crop",
-    caption: "💕 Side by side, always",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1516589174382-c6858b212b33?q=80&w=1200&auto=format&fit=crop",
-    caption: "🌸 Blessed and grateful",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1200&auto=format&fit=crop",
-    caption: "💍 Forever with you",
-  },
+  // 📸 Your photos
+  { src: "images/1.jpg", caption: "🤍 The beginning of us" },
+  // 🍬 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTJ5OWw5NnBqaTFqMTl6NWd4aHRlZnhxMDB4ZWd0dmt3YmJxNHJsZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/M9OoGnXoNqBLnUGVRi/giphy.gif", caption: "🍬 Sweet like candy" },
+  // 📸 Your photo
+  { src: "images/2.jpg", caption: "✨ A moment of grace" },
+  // 💖 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW1yYzV5cW9tNHFpdW5laDQ4bThvN3JhdTdhNmV4Z2N5YWNiajJyeSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26BRv0ThflsHCqDrG/giphy.gif", caption: "💖 My heart is yours" },
+  // 📸 Your photo
+  { src: "images/3.jpg", caption: "💕 Side by side, always" },
+  // 🧸 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaW81aHRtYjlkY3libm5kNjQ3dTkyemVidmlqb2t2M250cjdsaWllaiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3orieTfp1MeFLiBQR2/giphy.gif", caption: "🧸 Bear hugs for you" },
+  // 📸 Your photo
+  { src: "images/4.jpg", caption: "🌸 Blessed and grateful" },
+  // 💋 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJwOGxlMGU0cG5mMTh1a200bnc2NTBvb2RjajdsbmViYjMwcnl3NiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xT0xeMA62E1XIlqVG0/giphy.gif", caption: "💋 Kisses and blessings" },
+  // 📸 Your photo
+  { src: "images/5.jpg", caption: "💍 Forever with you" },
+  // 🌹 GIF
+  { src: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGR6Y3JsZWR5MnRwMHN0MHlicTdsOHRoNDhjenZmaHdtdGJvMWJ3NCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26FLdmIp6wJr91JAI/giphy.gif", caption: "🌹 Forever and always" },
 ];
 
 let currentLightboxIndex = 0;
@@ -300,3 +300,65 @@ observerInit.observe(document.body, {
   attributes: true,
   attributeFilter: ["class"],
 });
+
+// ======================================
+// DATE FORM SUBMISSION (STEP 6 → 7)
+// ======================================
+function handleDateSubmit(e) {
+  e.preventDefault();
+
+  const form = document.getElementById("dateForm");
+  const btn = document.getElementById("submitDateBtn");
+  const dateVal = document.getElementById("dateInput").value;
+  const timeVal = document.getElementById("timeInput").value;
+  const msgVal = document.getElementById("messageInput").value;
+
+  if (!dateVal || !timeVal) return;
+
+  // Show loading state
+  btn.classList.add("loading");
+  btn.textContent = "Sending...";
+
+  // Format the date nicely
+  const dateObj = new Date(dateVal + "T" + timeVal);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = dateObj.toLocaleDateString('en-US', options);
+  const formattedTime = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  // Prepare form data
+  const formData = new FormData(form);
+
+  // Send via fetch to FormSubmit
+  fetch(form.action, {
+    method: "POST",
+    body: formData,
+    headers: {
+      Accept: "application/json",
+    },
+  })
+    .then((response) => {
+      showConfirmation(formattedDate, formattedTime, msgVal);
+    })
+    .catch((error) => {
+      // Even if fetch fails, try iframe fallback
+      form.target = "form-target";
+      form.submit();
+      setTimeout(() => {
+        showConfirmation(formattedDate, formattedTime, msgVal);
+      }, 1500);
+    });
+}
+
+function showConfirmation(date, time, message) {
+  // Build the confirmation details
+  const details = document.getElementById("dateConfirmDetails");
+  let html = `📅 <strong>${date}</strong><br/>`;
+  html += `🕐 <strong>${time}</strong>`;
+  if (message && message.trim()) {
+    html += `<br/><br/>💌 "${message}"`;
+  }
+  details.innerHTML = html;
+
+  // Navigate to step 7
+  nextStep(7);
+}
